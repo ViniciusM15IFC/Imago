@@ -9,3 +9,7 @@ comandos pra instalar as dependencias necessárias:
 pip install torch torchvision --index-url https://download.pytorch.org/whl/cu121
 
 pip install diffusers transformers accelerate peft safetensors opencv-python pillow
+
+No PC da FSW: .\.venv\Scripts\Activate.ps1
+
+E rode: python main.py
