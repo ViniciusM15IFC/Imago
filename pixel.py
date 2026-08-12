@@ -1,7 +1,7 @@
 import torch
 from PIL import Image, ImageFilter
 
-from utils import cortar_quadrado_central
+from utils import cortar_quadrado_central, preparar_imagem, remover_fundo
 
 # Único ponto de edição pra todos os parâmetros de IA das duas rotas.
 # Os valores são diferentes entre "leve" e "pesada" de propósito: o ControlNet
@@ -10,7 +10,7 @@ from utils import cortar_quadrado_central
 
 CONFIG = {
     "leve": {
-        "strength": 0.38,
+        "strength": 0.40,
         "guidance_scale": 7.5,
         "num_inference_steps": 30,
         "lora_scale": 0.55,
@@ -20,9 +20,11 @@ CONFIG = {
         "resolucao_final": 512,
         "blur_radius": 2,
         "seed": 42,
+        "cor_fundo": (30, 30, 30),
         "prompt_positivo": (
             "pixelart, pixel art style, 16-bit retro video game sprite, "
-            "crisp pixel edges, flat colors, detailed portrait"
+            "crisp pixel edges, flat colors, detailed portrait, "
+            "sharp detailed eyes, clear iris and pupils"
         ),
         "prompt_negativo": "blurry, photo, realistic, 3d, smooth gradients, oil painting, messy, noise, dithering",
     },
@@ -33,17 +35,18 @@ CONFIG = {
         "lora_scale": 0.7,
         "controlnet_conditioning_scale": 0.6,
         "tamanho_crop": 1024,
-        "res_retro": 64,
+        "res_retro": 128,
         "cores": 48,
         "resolucao_final": 1024,
         "blur_radius": 2,
         "canny_low": 100,
         "canny_high": 200,
         "seed": 42,
+        "cor_fundo": (30, 30, 30),
         "prompt_positivo": (
             "pixel art, pixel art style, 16-bit retro video game character portrait, "
             "crisp pixel edges, flat shading, vibrant saturated colors, game sprite, "
-            "detailed character art"
+            "detailed character art, sharp detailed eyes, clear iris and pupils"
         ),
         "prompt_negativo": "blurry, photo, realistic, 3d render, smooth gradients, noise, dithering, low quality, deformed",
     },
@@ -85,6 +88,8 @@ def gerar_rota_leve(dispositivo, imagem_entrada):
         pipe.enable_attention_slicing()
 
     img_original = Image.open(imagem_entrada).convert("RGB")
+    img_original = preparar_imagem(img_original)
+    img_original = remover_fundo(img_original, cor_fundo=cfg["cor_fundo"])
     img_quadrada = cortar_quadrado_central(img_original, tamanho=cfg["tamanho_crop"])
 
     generator = torch.Generator(dispositivo).manual_seed(cfg["seed"])
@@ -149,6 +154,8 @@ def gerar_rota_pesada(imagem_entrada):
     pipe.enable_vae_slicing()
 
     img_original = Image.open(imagem_entrada).convert("RGB")
+    img_original = preparar_imagem(img_original)
+    img_original = remover_fundo(img_original, cor_fundo=cfg["cor_fundo"])
     img_quadrada = cortar_quadrado_central(img_original, tamanho=cfg["tamanho_crop"])
     mapa_canny = gerar_mapa_canny(img_quadrada, low=cfg["canny_low"], high=cfg["canny_high"])
 
