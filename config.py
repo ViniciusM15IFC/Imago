@@ -5,4 +5,7 @@ IMAGEM_SAIDA = "img/resultado_pixel_art.png"
 # Abaixo disso, mesmo tendo GPU, cai pra rota leve pra evitar out-of-memory.
 VRAM_MINIMA_ROTA_PESADA_GB = 8
 
+DEBUG = True
+PASTA_DEBUG = "img/debug"
+
 

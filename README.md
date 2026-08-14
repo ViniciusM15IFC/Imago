@@ -54,7 +54,7 @@ GPU: NVIDIA GeForce RTX 3080
 Instale as bibliotecas necessárias:
 
 ```powershell
-python -m pip install diffusers transformers accelerate peft safetensors opencv-python pillow huggingface_hub
+python -m pip install diffusers transformers accelerate peft safetensors pillow huggingface_hub rembg onnxruntime torchvision opencv-python-headless
 ```
 
 Essas bibliotecas são utilizadas para:
