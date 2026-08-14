@@ -3,7 +3,7 @@ import time
 import torch
 
 from config import IMAGEM_ENTRADA, IMAGEM_SAIDA, VRAM_MINIMA_ROTA_PESADA_GB
-from pixel import gerar_rota_leve, gerar_rota_pesada
+from pixel import gerar_rota_leve
 
 def detectar_rota():
     if not torch.cuda.is_available():
@@ -30,10 +30,8 @@ if __name__ == "__main__":
 
     if rota == "cpu":
         imagem_final = gerar_rota_leve(dispositivo="cpu", imagem_entrada=IMAGEM_ENTRADA)
-    elif rota == "gpu_fraca":
+    else:
         imagem_final = gerar_rota_leve(dispositivo="cuda", imagem_entrada=IMAGEM_ENTRADA)
-    else:  # gpu_forte
-        imagem_final = gerar_rota_pesada(imagem_entrada=IMAGEM_ENTRADA)
 
     imagem_final.save(IMAGEM_SAIDA)
 
