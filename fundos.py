@@ -1,6 +1,6 @@
 import os
 import random
-
+from config import DEBUG
 
 FUNDOS = {
     "disaster.png": {
@@ -43,10 +43,10 @@ FUNDOS = {
 
 def sortear_fundo(enquadramento, pasta=None):
     """
-    Sorteia um fundo compatível com o enquadramento.
+    Sorteia (ou escolhe manualmente se DEBUG=True) um fundo compatível com o enquadramento.
     Retorna: (caminho_fundo, estilos_compativeis)
     """
-    from config import PASTA_FUNDOS
+    from config import PASTA_FUNDOS, DEBUG
     pasta = pasta or PASTA_FUNDOS
 
     candidatos = [
@@ -55,17 +55,45 @@ def sortear_fundo(enquadramento, pasta=None):
     ]
 
     if not candidatos:
-        print(f"⚠️ Nenhum fundo encontrado para o enquadramento '{enquadramento}'. Sorteando entre todos.")
+        print(f"⚠️ Nenhum fundo encontrado para o enquadramento '{enquadramento}'. Usando todos disponíveis.")
         candidatos = list(FUNDOS.items())
 
     if not candidatos:
         print("⚠️ Nenhum fundo cadastrado.")
         return None, []
 
-    nome, meta = random.choice(candidatos)
+    # Se o modo DEBUG estiver ativo, permite escolher manualmente pelo terminal
+    if DEBUG:
+        print("\n--- 🛠️ MODO DEBUG: Escolha o fundo manualmente ---")
+        print("0. Sorteio automático (aleatório)")
+        
+        for i, (nome, meta) in enumerate(candidatos, start=1):
+            estilos_str = ", ".join(meta['estilos'])
+            print(f"{i}. {nome} (Estilos: {estilos_str})")
+
+        while True:
+            try:
+                escolha = input(f"\nDigite o número da opção (0 a {len(candidatos)}): ").strip()
+                escolha_idx = int(escolha)
+                
+                if escolha_idx == 0:
+                    nome, meta = random.choice(candidatos)
+                    print(f"🎲 Sorteio automático selecionado.")
+                    break
+                elif 1 <= escolha_idx <= len(candidatos):
+                    nome, meta = candidatos[escolha_idx - 1]
+                    break
+                else:
+                    print("❌ Opção inválida. Tente novamente.")
+            except ValueError:
+                print("❌ Por favor, digite apenas números inteiros.")
+    else:
+        # Comportamento padrão (aleatório) quando DEBUG for False
+        nome, meta = random.choice(candidatos)
+
     caminho = os.path.join(pasta, nome)
 
-    print(f"🖼️ Fundo sorteado: {nome}")
+    print(f"🖼️ Fundo selecionado: {nome}")
     print(f"🎨 Efeitos compatíveis: {', '.join(meta['estilos'])}")
 
     return caminho, meta["estilos"]
